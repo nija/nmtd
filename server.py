@@ -45,14 +45,17 @@ def main_handler():
     """
     main routing for requests
     """
-    if request.method == 'POST':
-        # return process_message(request.get_json())
-        logger.debug('Got POST from {}'.format(request.get_json()))
-        send_to_redis(request.get_json())
-    else:
-        # return get_message_stats()
-        logger.debug('Got GET')
-        return get_redis_stats()
+    try:
+        if request.method == 'POST':
+            # return process_message(request.get_json())
+            logger.debug('Got POST from {}'.format(request.get_json()))
+            send_to_redis(request.get_json())
+        else:
+            # return get_message_stats()
+            logger.debug('Got GET')
+            return get_redis_stats()
+    catch ValueError as e:
+        pass
 
 
 def get_redis_stats():
@@ -65,8 +68,8 @@ def send_to_redis(msg):
     redpath = '/parts/{}'.format(msg['Id'])
     greenpath = '/complete'
     reddy = redis.Redis(connection_pool=redpool)
-    length = reddy.lpush(redpath, msg)
-    logger.debug('Pushed to redis({} {}): {}'.format(length, redpath, msg))
+    length = reddy.lpush(redpath, json.dumps(msg))
+    logger.debug('Pushed to redis({} {}): {}'.format(length, redpath, json.dumps(msg)))
     if length == int(msg['TotalParts']):
         length = reddy.lpush(greenpath, redpath)
         logger.debug('MSG COMPLETE: Pushed to redis({} {}): {}'.format(length, greenpath, redpath))
