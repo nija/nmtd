@@ -66,7 +66,7 @@ def process_message(msg):
 
     # if both parts are filled, the message is complete
     if None not in parts:
-        app.logger.debug("got a complete message for %s" % msg_id)
+        APP.logger.debug("got a complete message for %s" % msg_id)
         print "have both parts"
         # We can build the final message.
         result = parts[0] + parts[1]
