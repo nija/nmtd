@@ -46,17 +46,14 @@ def main_handler():
     """
     main routing for requests
     """
-    try:
-        if request.method == 'POST':
-            # return process_message(request.get_json())
-            logger.debug('Got POST from {}'.format(request.get_json()))
-            send_to_redis(request.get_json())
-        else:
-            # return get_message_stats()
-            logger.debug('Got GET')
-            return get_redis_stats()
-    except ValueError as e:
-        pass
+    if request.method == 'POST':
+        # return process_message(request.get_json())
+        logger.debug('Got POST from {}'.format(request.get_json()))
+        send_to_redis(request.get_json())
+    else:
+        # return get_message_stats()
+        logger.debug('Got GET')
+        return get_redis_stats()
 
 
 def get_redis_stats():
@@ -84,6 +81,9 @@ if __name__ == "__main__":
     # APP.run(host="0.0.0.0", port="80")
 
     logger.debug("\n\t\tSTARTED SERVER - {}\n".format(ARGS))
-    # Use this to enable threading:
-    APP.run(host="0.0.0.0", port="80", threaded=True)
+    try:
+        # Use this to enable threading:
+        APP.run(host="0.0.0.0", port="80", threaded=True)
+    except ValueError as e:
+        pass
     logger.debug("\n\t\tSERVER STOPPED\n")
