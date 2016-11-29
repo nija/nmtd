@@ -12,6 +12,7 @@ import logging
 import argparse
 import urllib2
 import redis
+import json
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
