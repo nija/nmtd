@@ -14,6 +14,12 @@ import urllib2
 import redis
 
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 # parsing arguments
 PARSER = argparse.ArgumentParser(description='Client message processor')
@@ -41,9 +47,11 @@ def main_handler():
     """
     if request.method == 'POST':
         # return process_message(request.get_json())
+        logger.debug('Got POST from {}'.format(request.get_json()))
         send_to_redis(request.get_json())
     else:
         # return get_message_stats()
+        logger.debug('Got GET')
         return get_redis_stats()
 
 
@@ -58,8 +66,10 @@ def send_to_redis(msg):
     greenpath = '/complete'
     reddy = redis.Redis(connection_pool=redpool)
     length = reddy.lpush(redpath, msg)
-    if length == msg['TotalParts']:
+    logger.debug('Pushed to redis({} {}): {}'.format(length, redpath, msg))
+    if length == int(msg['TotalParts']):
         length = reddy.lpush(greenpath, redpath)
+        logger.debug('MSG COMPLETE: Pushed to redis({} {}): {}'.format(length, greenpath, redpath))
     return True
 
 if __name__ == "__main__":
@@ -69,5 +79,7 @@ if __name__ == "__main__":
     # and fail ALB healthchecks, but whatever I know I'm getting fired on Friday.
     # APP.run(host="0.0.0.0", port="80")
 
+    logger.debug("\n\t\tSTARTED SERVER - {} {}\n".format(ARGS))
     # Use this to enable threading:
     APP.run(host="0.0.0.0", port="80", threaded=True)
+    logger.debug("\n\t\tSERVER STOPPED\n")
