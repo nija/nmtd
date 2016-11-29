@@ -28,7 +28,7 @@ API_BASE = ARGS.API_base
 # 'https://csm45mnow5.execute-api.us-west-2.amazonaws.com/dev'
 
 # Persistent connection to redis
-redpool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+redpool = redis.ConnectionPool(host='redis-msg.cdje8j.ng.0001.euc1.cache.amazonaws.com', port=6379, db=0)
 
 APP = Flask(__name__)
 
@@ -47,14 +47,6 @@ def main_handler():
         return get_redis_stats()
 
 
-# def get_message_stats():
-#     """
-#     provides a status that players can check
-#     """
-#     msg_count = len(MESSAGES.keys())
-#     return "There are %d messages in the MESSAGES dictionary" % msg_count
-
-
 def get_redis_stats():
     reddy.redis.Redis(connection_pool=redpool)
     redkeys = reddy.keys('/parts/*')
@@ -69,49 +61,6 @@ def send_to_redis(msg):
     if length == msg['TotalParts']:
         length = reddy.lpush(greenpath, redpath)
     return True
-
-
-# def process_message(msg):
-#     """
-#     processes the messages by combining and appending the kind code
-#     """
-
-#     msg_id = msg['Id']                  # The unique ID for this message
-#     part_number = msg['PartNumber']     # Which part of the message it is
-#     data = msg['Data']                  # The data of the message
-
-#     # Try to get the parts of the message from the MESSAGES dictionary.
-#     # If it's not there, create one that has None in both parts
-#     parts = MESSAGES.get(msg_id, [None, None])
-
-#     # store this part of the message in the correct part of the list
-#     parts[part_number] = data
-
-#     # store the parts in MESSAGES
-#     MESSAGES[msg_id] = parts
-
-#     # if both parts are filled, the message is complete
-#     if None not in parts:
-#         app.logger.debug("got a complete message for %s" % msg_id)
-#         print "have both parts"
-#         # We can build the final message.
-#         result = parts[0] + parts[1]
-#         # sending the response to the score calculator
-#         # format:
-#         #   url -> api_base/jFgwN4GvTB1D2QiQsQ8GHwQUbbIJBS6r7ko9RVthXCJqAiobMsLRmsuwZRQTlOEW
-#         #   headers -> x-gameday-token = API_token
-#         #   data -> EaXA2G8cVTj1LGuRgv8ZhaGMLpJN2IKBwC5eYzAPNlJwkN4Qu1DIaI3H1zyUdf1H5NITR
-#         APP.logger.debug("ID: %s" % msg_id)
-#         APP.logger.debug("RESULT: %s" % result)
-#         url = API_BASE + '/' + msg_id
-#         print url
-#         print result
-#         req = urllib2.Request(url, data=result, headers={'x-gameday-token':ARGS.API_token})
-#         resp = urllib2.urlopen(req)
-#         resp.close()
-#         print response
-
-#     return 'OK'
 
 if __name__ == "__main__":
 
