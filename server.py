@@ -50,6 +50,7 @@ def main_handler():
         # return process_message(request.get_json())
         logger.debug('Got POST from {}'.format(request.get_json()))
         send_to_redis(request.get_json())
+        return 'OK'
     else:
         # return get_message_stats()
         logger.debug('Got GET')
@@ -66,11 +67,13 @@ def send_to_redis(msg):
     redpath = '/parts/{}'.format(msg['Id'])
     greenpath = '/complete'
     reddy = redis.Redis(connection_pool=redpool)
+    logger.debug('Pushing to redis({} {}): {}'.format(length, redpath, json.dumps(msg)))
     length = reddy.lpush(redpath, json.dumps(msg))
-    logger.debug('Pushed to redis({} {}): {}'.format(length, redpath, json.dumps(msg)))
+    logger.info('Pushed to redis({} {}): {}'.format(length, redpath, json.dumps(msg)))
     if length == int(msg['TotalParts']):
+        logger.debug('MSG COMPLETE: Pushing to redis({} {}): {}'.format(length, greenpath, redpath))
         length = reddy.lpush(greenpath, redpath)
-        logger.debug('MSG COMPLETE: Pushed to redis({} {}): {}'.format(length, greenpath, redpath))
+        logger.info('MSG COMPLETE: Pushed to redis({} {}): {}'.format(length, greenpath, redpath))
     return True
 
 if __name__ == "__main__":
