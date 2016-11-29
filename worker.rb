@@ -16,7 +16,7 @@ class IsoLogger < Logger
   end
 end
 
-logger = IsoLogger.new(STDOUT)
+logger = IsoLogger.new('worker.log')
 RestClient.log = logger
 
 redis = Redis.new(host: 'redis-msg.cdje8j.ng.0001.euc1.cache.amazonaws.com')
