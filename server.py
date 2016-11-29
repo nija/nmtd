@@ -54,7 +54,7 @@ def main_handler():
             # return get_message_stats()
             logger.debug('Got GET')
             return get_redis_stats()
-    catch ValueError as e:
+    except ValueError as e:
         pass
 
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # and fail ALB healthchecks, but whatever I know I'm getting fired on Friday.
     # APP.run(host="0.0.0.0", port="80")
 
-    logger.debug("\n\t\tSTARTED SERVER - {} {}\n".format(ARGS))
+    logger.debug("\n\t\tSTARTED SERVER - {}\n".format(ARGS))
     # Use this to enable threading:
     APP.run(host="0.0.0.0", port="80", threaded=True)
     logger.debug("\n\t\tSERVER STOPPED\n")
